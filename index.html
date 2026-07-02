@@ -91,16 +91,17 @@ body { background:var(--bg); color:var(--text1); transition:background 0.2s,colo
 .summary-val { font-size:15px; font-weight:700; }
 
 /* CUENTAS */
-.cuenta-card { background:var(--bg2); border-radius:18px; padding:18px; box-shadow:0 1px 4px var(--shadow); margin-bottom:12px; }
-.cuenta-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
-.cuenta-icon { width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.cuenta-nombre { font-size:16px; font-weight:700; color:var(--text1); }
-.cuenta-tipo { font-size:12px; color:var(--text4); margin-top:1px; }
-.cuenta-saldo-principal { font-size:28px; font-weight:700; letter-spacing:-0.8px; margin-bottom:4px; }
-.cuenta-saldos-row { display:flex; gap:12px; margin-top:8px; padding-top:10px; border-top:1px solid var(--divider); }
-.cuenta-saldo-mini { flex:1; }
-.cuenta-saldo-mini-label { font-size:10px; color:var(--text4); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px; }
-.cuenta-saldo-mini-val { font-size:16px; font-weight:700; }
+.cuenta-group-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--text4); margin:14px 2px 6px; }
+.cuenta-group-label:first-child { margin-top:0; }
+.cuenta-card { background:var(--bg2); border-radius:14px; padding:10px 12px; box-shadow:0 1px 3px var(--shadow); margin-bottom:7px; cursor:pointer; }
+.cuenta-row1 { display:flex; align-items:center; gap:9px; }
+.cuenta-icon { width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:15px; }
+.cuenta-nombre { font-size:13.5px; font-weight:700; color:var(--text1); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cuenta-saldo-principal { font-size:14.5px; font-weight:700; letter-spacing:-0.3px; white-space:nowrap; }
+.cuenta-row2 { display:flex; align-items:center; gap:8px; margin-top:3px; padding-left:39px; }
+.cuenta-tipo { font-size:10.5px; color:var(--text4); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cuenta-actions { display:flex; gap:4px; flex-shrink:0; }
+.cuenta-mini-btn { width:22px; height:22px; border-radius:50%; border:none; background:var(--bg3); color:var(--text3); cursor:pointer; display:flex; align-items:center; justify-content:center; }
 .cuenta-add-btn { width:32px; height:32px; border-radius:50%; border:none; background:var(--bg3); color:var(--text3); cursor:pointer; display:flex; align-items:center; justify-content:center; margin-left:auto; }
 .add-cuenta-btn { width:100%; padding:14px; border-radius:14px; border:2px dashed var(--border); background:transparent; color:var(--text4); font-size:14px; font-weight:500; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:4px; }
 .add-cuenta-btn:active { background:var(--bg3); }
@@ -551,6 +552,23 @@ body { background:var(--bg); color:var(--text1); transition:background 0.2s,colo
   </div>
 </div>
 
+<div class="detail-overlay" id="cuenta-detail-overlay" onclick="closeCuentaDetail(event)">
+  <div class="detail-drawer" onclick="event.stopPropagation()">
+    <div class="detail-header">
+      <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px"></div>
+      <div class="detail-header-top">
+        <div class="detail-title" id="cuenta-detail-title">Cuenta</div>
+        <button class="detail-close" onclick="document.getElementById('cuenta-detail-overlay').classList.remove('open')">
+          <i class="ti ti-x" style="font-size:16px;color:var(--text3)"></i>
+        </button>
+      </div>
+      <div class="detail-total" id="cuenta-detail-total">$0</div>
+      <div style="font-size:12px;color:var(--text4);margin-top:2px" id="cuenta-detail-subtitle"></div>
+    </div>
+    <div class="detail-list" id="cuenta-detail-list"></div>
+  </div>
+</div>
+
 <!-- ═══ SUB-PANEL ═══ -->
 <div class="sub-overlay" id="sub-overlay" onclick="if(event.target===this)closeSubPanelDirect()">
   <div class="sub-panel" onclick="event.stopPropagation()">
@@ -580,6 +598,10 @@ body { background:var(--bg); color:var(--text1); transition:background 0.2s,colo
     </select>
     <div class="field-label">Saldo inicial ($)</div>
     <input class="field-input" id="cuenta-saldo-input" type="text" inputmode="decimal" placeholder="0,00">
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-top:-10px;margin-bottom:16px;cursor:pointer">
+      <input type="checkbox" id="cuenta-es-deuda" style="width:17px;height:17px">
+      Es un préstamo o deuda (saldo negativo)
+    </label>
     <button class="save-btn" style="background:#1B6B4A" onclick="saveCuenta()">Guardar cuenta</button>
   </div>
 </div>
@@ -659,6 +681,8 @@ const CATS_META = {
 };
 const DONUT_COLORS=['#dc2626','#16a34a','#2563eb','#ca8a04','#9333ea','#0891b2','#c2410c','#0f766e'];
 const TIPO_ICONS = { efectivo:'💵', banco:'🏦', tarjeta:'💳', ahorro:'🐖', inversion:'📈', otro:'📂' };
+const TIPO_ORDER = ['efectivo','banco','ahorro','inversion','tarjeta','otro'];
+const TIPO_LABELS = { efectivo:'Efectivo', banco:'Bancos', ahorro:'Ahorro', inversion:'Inversiones', tarjeta:'Tarjetas de crédito', otro:'Otras cuentas' };
 
 let entries=[], cuentas=[], presupuestos={}, tarjetaConfig={diacierre:25,diavencimiento:7};
 let currentType='gastos', currentMonth=new Date().getMonth(), currentYear=new Date().getFullYear();
@@ -687,7 +711,14 @@ const saveCats=()=>{ localStorage.setItem('mf_cats',JSON.stringify(CATS_DATA)); 
 const saveTarjetaConfig=()=>{ localStorage.setItem('mf_tarjeta_cfg',JSON.stringify(tarjetaConfig)); };
 
 function getCat(type){ return {...CATS_META[type], sub:CATS_DATA[type]}; }
-function parseAmt(str){ if(!str) return 0; return parseFloat(String(str).replace(/\./g,'').replace(',','.')) || 0; }
+function parseAmt(str){
+  if(!str) return 0;
+  let s=String(str).trim();
+  let neg=false;
+  if(s.startsWith('-')){ neg=true; s=s.slice(1); }
+  const val=parseFloat(s.replace(/\./g,'').replace(',','.'))||0;
+  return neg?-val:val;
+}
 function toDateInputValue(year,month,day){ return `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`; }
 function parseDateInputValue(val){
   if(!val) return null;
@@ -700,8 +731,8 @@ function defaultEntryDateValue(){
   if(today.getMonth()===currentMonth && today.getFullYear()===currentYear) return toDateInputValue(currentYear,currentMonth,today.getDate());
   return toDateInputValue(currentYear,currentMonth,1);
 }
-function fmt(n){ return '$'+Math.round(n).toLocaleString('es-AR'); }
-function fmtDec(n){ return '$'+parseFloat(n).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmt(n){ const neg=n<0; return (neg?'-':'')+'$'+Math.round(Math.abs(n)).toLocaleString('es-AR'); }
+function fmtDec(n){ const neg=n<0; return (neg?'-':'')+'$'+Math.abs(parseFloat(n)).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function iconHtml(c,size){ return `<i class="ti ${c.iconClass}" style="font-size:${size}px;color:${c.iconColor}"></i>`; }
 function getFiltered(){ return entries.filter(e=>e.month===currentMonth&&e.year===currentYear&&e.view===currentView); }
 function sumType(type){ return getFiltered().filter(e=>e.type===type).reduce((a,e)=>a+e.amount,0); }
@@ -974,6 +1005,7 @@ function deleteByTs(ts){
   save();
   updateAll();
   if(currentDetail) updateDetail(currentDetail);
+  if(currentCuentaDetailId) updateCuentaDetail();
   if(document.getElementById('page-cuentas').classList.contains('active')) renderCuentas();
   showToast('Movimiento eliminado');
 }
@@ -988,46 +1020,83 @@ function saldoCuenta(cu){
 function renderCuentas(){
   const el=document.getElementById('cuentas-list');
   if(!cuentas.length){ el.innerHTML='<div class="history-empty"><i class="ti ti-wallet"></i>Agregá tu primera cuenta</div>'; return; }
-  el.innerHTML=cuentas.map(cu=>{
-    const icon=TIPO_ICONS[cu.tipo]||'📂';
-    const saldoActual = saldoCuenta(cu);
-    const visible = cu.visible!==false;
-
-    let extraHtml='';
-    if(cu.tipo==='tarjeta'){
-      const pagos = entries.filter(e=>e.cuentaId===cu.id&&e.type==='pago_tarjeta').reduce((a,e)=>a+e.amount,0);
-      // Saldo pendiente de cierre actual (gastos del mes en curso), neto de pagos ya realizados
-      const gastoDelMes = entries.filter(e=>e.cuentaId===cu.id&&e.type==='tarjetas'&&e.month===currentMonth&&e.year===currentYear).reduce((a,e)=>a+e.amount,0);
-      const sinCerrar = Math.max(0,gastoDelMes-pagos);
-      // Deuda total (todas las cuotas futuras pendientes), neta de pagos ya realizados
-      const deudaBruta = entries.filter(e=>e.cuentaId===cu.id&&e.type==='tarjetas'&&(e.year>currentYear||(e.year===currentYear&&e.month>=currentMonth))).reduce((a,e)=>a+e.amount,0);
-      const deudaTotal = Math.max(0,deudaBruta-pagos);
-      extraHtml=`<div class="cuenta-saldos-row">
-        <div class="cuenta-saldo-mini"><div class="cuenta-saldo-mini-label">Sin cerrar (este mes)</div><div class="cuenta-saldo-mini-val" style="color:#dc2626">${fmt(sinCerrar)}</div></div>
-        <div class="cuenta-saldo-mini"><div class="cuenta-saldo-mini-label">Deuda total (cuotas)</div><div class="cuenta-saldo-mini-val" style="color:#7c3aed">${fmt(deudaTotal)}</div></div>
-      </div>`;
-    }
-
-    const color=saldoActual>=0?'#16a34a':'#dc2626';
-    return `<div class="cuenta-card" style="${visible?'':'opacity:0.55'}">
-      <div class="cuenta-header">
-        <div class="cuenta-icon" style="background:var(--bg3);font-size:22px">${icon}</div>
-        <div style="flex:1">
-          <div class="cuenta-nombre">${cu.nombre}</div>
-          <div class="cuenta-tipo">${cu.tipo}</div>
-        </div>
-        <div style="display:flex;gap:6px;margin-left:auto">
-          <button class="cuenta-add-btn" style="margin-left:0" onclick="toggleCuentaVisible('${cu.id}')" title="${visible?'Excluir del balance disponible':'Incluir en el balance disponible'}"><i class="ti ${visible?'ti-eye':'ti-eye-off'}" style="font-size:16px;color:${visible?'#1B6B4A':'var(--text4)'}"></i></button>
-          ${cu.tipo==='tarjeta'?`<button class="cuenta-add-btn" style="margin-left:0;background:#d1fae5" onclick="openPagarTarjeta('${cu.id}')" title="Pagar tarjeta"><i class="ti ti-cash" style="font-size:16px;color:#059669"></i></button>`:''}
-          <button class="cuenta-add-btn" style="margin-left:0" onclick="deleteCuenta('${cu.id}')" title="Eliminar"><i class="ti ti-trash" style="font-size:16px;color:#dc2626"></i></button>
-        </div>
-      </div>
-      <div class="cuenta-saldo-principal" style="color:${color}">${fmt(saldoActual)}</div>
-      ${extraHtml}
-    </div>`;
-  }).join('');
+  const tiposPresentes=[...new Set(cuentas.map(c=>c.tipo))];
+  const orden=[...TIPO_ORDER, ...tiposPresentes.filter(t=>!TIPO_ORDER.includes(t))];
+  let html='';
+  orden.forEach(tipo=>{
+    const grupo=cuentas.filter(c=>c.tipo===tipo);
+    if(!grupo.length) return;
+    html+=`<div class="cuenta-group-label">${TIPO_LABELS[tipo]||tipo}</div>`;
+    html+=grupo.map(cu=>renderCuentaCard(cu)).join('');
+  });
+  el.innerHTML=html;
   updateDisponible();
 }
+
+function renderCuentaCard(cu){
+  const icon=TIPO_ICONS[cu.tipo]||'📂';
+  const saldoActual = saldoCuenta(cu);
+  const visible = cu.visible!==false;
+  let sub;
+  if(cu.tipo==='tarjeta'){
+    const pagos = entries.filter(e=>e.cuentaId===cu.id&&e.type==='pago_tarjeta').reduce((a,e)=>a+e.amount,0);
+    const gastoDelMes = entries.filter(e=>e.cuentaId===cu.id&&e.type==='tarjetas'&&e.month===currentMonth&&e.year===currentYear).reduce((a,e)=>a+e.amount,0);
+    const sinCerrar = Math.max(0,gastoDelMes-pagos);
+    const deudaBruta = entries.filter(e=>e.cuentaId===cu.id&&e.type==='tarjetas'&&(e.year>currentYear||(e.year===currentYear&&e.month>=currentMonth))).reduce((a,e)=>a+e.amount,0);
+    const deudaTotal = Math.max(0,deudaBruta-pagos);
+    sub=`Sin cerrar ${fmt(sinCerrar)} · Deuda ${fmt(deudaTotal)}`;
+  } else {
+    sub=cu.tipo;
+  }
+  const color=saldoActual>=0?'#16a34a':'#dc2626';
+  return `<div class="cuenta-card" style="${visible?'':'opacity:0.55'}" onclick="openCuentaDetail('${cu.id}')">
+    <div class="cuenta-row1">
+      <div class="cuenta-icon" style="background:var(--bg3)">${icon}</div>
+      <div class="cuenta-nombre">${cu.nombre}</div>
+      <div class="cuenta-saldo-principal" style="color:${color}">${fmt(saldoActual)}</div>
+    </div>
+    <div class="cuenta-row2">
+      <div class="cuenta-tipo">${sub}</div>
+      <div class="cuenta-actions" onclick="event.stopPropagation()">
+        <button class="cuenta-mini-btn" onclick="toggleCuentaVisible('${cu.id}')" title="${visible?'Excluir del balance disponible':'Incluir en el balance disponible'}"><i class="ti ${visible?'ti-eye':'ti-eye-off'}" style="font-size:12px;color:${visible?'#1B6B4A':'var(--text4)'}"></i></button>
+        ${cu.tipo==='tarjeta'?`<button class="cuenta-mini-btn" style="background:#d1fae5" onclick="openPagarTarjeta('${cu.id}')" title="Pagar tarjeta"><i class="ti ti-cash" style="font-size:12px;color:#059669"></i></button>`:''}
+        <button class="cuenta-mini-btn" onclick="deleteCuenta('${cu.id}')" title="Eliminar"><i class="ti ti-trash" style="font-size:12px;color:#dc2626"></i></button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── DETALLE POR CUENTA (movimientos del mes) ──
+let currentCuentaDetailId=null;
+function openCuentaDetail(cuentaId){
+  const cu=cuentas.find(c=>c.id===cuentaId);
+  if(!cu) return;
+  currentCuentaDetailId=cuentaId;
+  updateCuentaDetail();
+  document.getElementById('cuenta-detail-overlay').classList.add('open');
+}
+function updateCuentaDetail(){
+  const cu=cuentas.find(c=>c.id===currentCuentaDetailId);
+  if(!cu) return;
+  const es=entries.filter(e=>e.cuentaId===cu.id&&e.month===currentMonth&&e.year===currentYear&&e.view===currentView).slice().sort((a,b)=>b.ts-a.ts);
+  document.getElementById('cuenta-detail-title').textContent=cu.nombre;
+  document.getElementById('cuenta-detail-subtitle').textContent=`Movimientos de ${MONTHS[currentMonth]} ${currentYear}`;
+  const totalMes=es.reduce((a,e)=>{
+    if(e.type==='transferencia') return a+(e.direccion==='entrada'?e.amount:-e.amount);
+    if(e.type==='pago_tarjeta') return a+e.amount;
+    if(e.type==='ingresos'||e.type==='ahorro') return a+e.amount;
+    if(e.type==='gastos'||e.type==='tarjetas') return a-e.amount;
+    return a;
+  },0);
+  const dt=document.getElementById('cuenta-detail-total');
+  dt.textContent=fmt(totalMes);
+  dt.style.color=totalMes>=0?'#16a34a':'#dc2626';
+  const dl=document.getElementById('cuenta-detail-list');
+  if(!es.length){ dl.innerHTML='<div class="history-empty"><i class="ti ti-inbox"></i>Sin movimientos este mes en esta cuenta</div>'; return; }
+  dl.innerHTML=es.map(e=>renderHistoryItem(e,false)).join('');
+}
+function closeCuentaDetail(e){ if(e.target===document.getElementById('cuenta-detail-overlay')){ document.getElementById('cuenta-detail-overlay').classList.remove('open'); currentCuentaDetailId=null; } }
+
 
 function updateDisponible(){
   const row=document.getElementById('disponible-row');
@@ -1053,6 +1122,7 @@ function openAddCuenta(){
   document.getElementById('cuenta-nombre-input').value='';
   document.getElementById('cuenta-tipo-select').value='efectivo';
   document.getElementById('cuenta-saldo-input').value='';
+  document.getElementById('cuenta-es-deuda').checked=false;
   document.getElementById('cuenta-modal-overlay').classList.add('open');
 }
 
@@ -1060,7 +1130,8 @@ function saveCuenta(){
   const nombre=document.getElementById('cuenta-nombre-input').value.trim();
   if(!nombre){ showToast('Ingresá un nombre'); return; }
   const tipo=document.getElementById('cuenta-tipo-select').value;
-  const saldoInicial=parseAmt(document.getElementById('cuenta-saldo-input').value);
+  let saldoInicial=parseAmt(document.getElementById('cuenta-saldo-input').value);
+  if(document.getElementById('cuenta-es-deuda').checked) saldoInicial=-Math.abs(saldoInicial);
   const id=editingCuentaId||('c'+Date.now());
   if(editingCuentaId){ const idx=cuentas.findIndex(c=>c.id===editingCuentaId); if(idx>=0) cuentas[idx]={...cuentas[idx],id,nombre,tipo,saldoInicial}; }
   else cuentas.push({id,nombre,tipo,saldoInicial,visible:true});
@@ -1114,6 +1185,7 @@ function savePagoTarjeta(){
   pagandoTarjetaId=null;
   updateAll();
   renderCuentas();
+  if(currentCuentaDetailId) updateCuentaDetail();
   showToast('✓ Pago registrado');
 }
 
@@ -1159,6 +1231,7 @@ function saveTransfer(){
   document.getElementById('transfer-modal-overlay').classList.remove('open');
   updateAll();
   renderCuentas();
+  if(currentCuentaDetailId) updateCuentaDetail();
   showToast('✓ Transferencia realizada');
 }
 
@@ -1334,6 +1407,7 @@ function saveEntry(){
     document.getElementById('modal-overlay').classList.remove('open');
     updateAll();
     if(document.getElementById('page-cuentas').classList.contains('active')) renderCuentas();
+    if(currentCuentaDetailId) updateCuentaDetail();
     showToast('✓ Movimiento actualizado');
     return;
   }
@@ -1361,6 +1435,7 @@ function saveEntry(){
   document.getElementById('modal-overlay').classList.remove('open');
   updateAll();
   if(document.getElementById('page-cuentas').classList.contains('active')) renderCuentas();
+  if(currentCuentaDetailId) updateCuentaDetail();
 }
 
 function changeMonth(dir){
