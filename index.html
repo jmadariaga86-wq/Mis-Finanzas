@@ -91,17 +91,17 @@ body { background:var(--bg); color:var(--text1); transition:background 0.2s,colo
 .summary-val { font-size:15px; font-weight:700; }
 
 /* CUENTAS */
-.cuenta-group-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--text4); margin:14px 2px 6px; }
+.cuenta-group-label { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--text4); margin:10px 2px 5px; }
 .cuenta-group-label:first-child { margin-top:0; }
-.cuenta-card { background:var(--bg2); border-radius:14px; padding:10px 12px; box-shadow:0 1px 3px var(--shadow); margin-bottom:7px; cursor:pointer; }
-.cuenta-row1 { display:flex; align-items:center; gap:9px; }
-.cuenta-icon { width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:15px; }
-.cuenta-nombre { font-size:13.5px; font-weight:700; color:var(--text1); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.cuenta-saldo-principal { font-size:14.5px; font-weight:700; letter-spacing:-0.3px; white-space:nowrap; }
-.cuenta-row2 { display:flex; align-items:center; gap:8px; margin-top:3px; padding-left:39px; }
-.cuenta-tipo { font-size:10.5px; color:var(--text4); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.cuenta-actions { display:flex; gap:4px; flex-shrink:0; }
-.cuenta-mini-btn { width:22px; height:22px; border-radius:50%; border:none; background:var(--bg3); color:var(--text3); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.cuenta-card { background:var(--bg2); border-radius:12px; padding:8px 10px; box-shadow:0 1px 3px var(--shadow); margin-bottom:5px; cursor:pointer; }
+.cuenta-row1 { display:flex; align-items:center; gap:8px; }
+.cuenta-icon { width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:13px; }
+.cuenta-nombre { font-size:12.5px; font-weight:700; color:var(--text1); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cuenta-saldo-principal { font-size:13px; font-weight:700; letter-spacing:-0.3px; white-space:nowrap; }
+.cuenta-row2 { display:flex; align-items:center; gap:6px; margin-top:2px; padding-left:34px; }
+.cuenta-tipo { font-size:9.5px; color:var(--text4); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cuenta-actions { display:flex; gap:3px; flex-shrink:0; }
+.cuenta-mini-btn { width:19px; height:19px; border-radius:50%; border:none; background:var(--bg3); color:var(--text3); cursor:pointer; display:flex; align-items:center; justify-content:center; }
 .cuenta-add-btn { width:32px; height:32px; border-radius:50%; border:none; background:var(--bg3); color:var(--text3); cursor:pointer; display:flex; align-items:center; justify-content:center; margin-left:auto; }
 .add-cuenta-btn { width:100%; padding:14px; border-radius:14px; border:2px dashed var(--border); background:transparent; color:var(--text4); font-size:14px; font-weight:500; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:4px; }
 .add-cuenta-btn:active { background:var(--bg3); }
@@ -185,6 +185,11 @@ body { background:var(--bg); color:var(--text1); transition:background 0.2s,colo
 .detail-close { width:30px; height:30px; background:var(--bg); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border:none; }
 .detail-total { font-size:28px; font-weight:700; }
 .detail-list { padding:12px 16px; display:flex; flex-direction:column; gap:8px; }
+.search-wrap { display:flex; align-items:center; gap:8px; background:var(--bg2); border-radius:14px; padding:11px 14px; margin-bottom:14px; box-shadow:0 1px 3px var(--shadow); }
+.search-wrap i.ti-search { font-size:17px; color:var(--text4); flex-shrink:0; }
+.search-wrap input { flex:1; min-width:0; border:none; background:transparent; outline:none; font-size:14px; color:var(--text1); font-family:inherit; }
+.search-wrap input::placeholder { color:var(--text4); }
+#search-clear-btn { background:none; border:none; cursor:pointer; color:var(--text4); padding:2px; display:flex; align-items:center; flex-shrink:0; }
 .delete-btn { background:none; border:none; cursor:pointer; color:var(--text4); padding:4px; }
 .delete-btn:active { color:#ef4444; }
 .edit-btn { background:none; border:none; cursor:pointer; color:var(--text4); padding:4px; }
@@ -232,6 +237,17 @@ body { background:var(--bg); color:var(--text1); transition:background 0.2s,colo
 .add-item-input { flex:1; padding:11px 14px; border-radius:12px; border:1.5px solid var(--border); font-size:14px; color:var(--text1); background:var(--bg2); outline:none; }
 .add-item-input:focus { border-color:#1B6B4A; }
 .add-item-btn { padding:11px 18px; border-radius:12px; background:#1B6B4A; color:white; border:none; font-size:14px; font-weight:600; cursor:pointer; }
+.cat-group { border-bottom:1px solid var(--divider); padding-bottom:4px; margin-bottom:2px; }
+.cat-group:last-child { border-bottom:none; }
+.cat-group-header { display:flex; align-items:center; gap:8px; padding:12px 0 6px; }
+.cat-group-header .edit-item-name { font-weight:700; }
+.cat-sub-item { display:flex; align-items:center; gap:8px; padding:7px 0 7px 20px; }
+.cat-sub-item .edit-item-name { font-size:13px; color:var(--text2); }
+.cat-sub-item .edit-item-name::before { content:"↳ "; color:var(--text4); }
+.cat-sub-add-row { display:flex; gap:6px; padding:2px 0 10px 20px; }
+.cat-sub-add-input { flex:1; padding:8px 10px; border-radius:9px; border:1.5px solid var(--border); font-size:12.5px; color:var(--text1); background:var(--bg2); outline:none; min-width:0; }
+.cat-sub-add-btn { padding:8px 12px; border-radius:9px; background:var(--bg3); color:var(--text2); border:none; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0; }
+.edit-item-btn-sm { width:24px; height:24px; border-radius:7px; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:12px; flex-shrink:0; }
 .tarjeta-config-label { font-size:12px; color:var(--text4); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; margin-top:14px; }
 .tarjeta-config-field label { font-size:12px; color:var(--text3); margin-bottom:4px; display:block; }
 .tarjeta-config-field select { width:100%; padding:10px 12px; border-radius:10px; border:1.5px solid var(--border); font-size:14px; color:var(--text1); background:var(--bg2); outline:none; -webkit-appearance:none; }
@@ -330,6 +346,11 @@ body { background:var(--bg); color:var(--text1); transition:background 0.2s,colo
   <div id="page-movimientos" class="page">
     <div style="padding:16px">
       <div class="section-label" style="margin-bottom:12px">Todos los movimientos</div>
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input type="text" id="search-input" placeholder="Buscar por descripción, categoría, cuenta o monto..." oninput="onSearchInput(this.value)">
+        <button id="search-clear-btn" onclick="clearSearch()" style="display:none"><i class="ti ti-x"></i></button>
+      </div>
       <div id="history-list"></div>
     </div>
   </div>
@@ -438,6 +459,15 @@ body { background:var(--bg); color:var(--text1); transition:background 0.2s,colo
       <div class="settings-row-left">
         <div class="settings-row-icon" style="background:#dbeafe"><i class="ti ti-credit-card" style="color:#2563eb"></i></div>
         <div><div class="settings-row-label">Tarjetas</div><div class="settings-row-sub" id="sub-count-tarjetas">…</div></div>
+      </div>
+      <i class="ti ti-chevron-right" style="color:var(--text4)"></i>
+    </div>
+
+    <div class="settings-section-label">Cuentas</div>
+    <div class="settings-row tap" onclick="openSubPanel('cuentas')">
+      <div class="settings-row-left">
+        <div class="settings-row-icon" style="background:#d1fae5"><i class="ti ti-wallet" style="color:#059669"></i></div>
+        <div><div class="settings-row-label">Mis cuentas</div><div class="settings-row-sub" id="sub-count-cuentas">…</div></div>
       </div>
       <i class="ti ti-chevron-right" style="color:var(--text4)"></i>
     </div>
@@ -588,14 +618,18 @@ body { background:var(--bg); color:var(--text1); transition:background 0.2s,colo
     <div class="field-label">Nombre</div>
     <input class="field-input" id="cuenta-nombre-input" type="text" placeholder="Ej: Efectivo, Banco Galicia...">
     <div class="field-label">Tipo</div>
-    <select class="field-select" id="cuenta-tipo-select">
+    <select class="field-select" id="cuenta-tipo-select" onchange="onCuentaTipoChangeUI()">
       <option value="efectivo">💵 Efectivo</option>
       <option value="banco">🏦 Banco / Cuenta bancaria</option>
       <option value="tarjeta">💳 Tarjeta de crédito</option>
       <option value="ahorro">🐖 Caja de ahorro</option>
       <option value="inversion">📈 Inversión</option>
       <option value="otro">📂 Otro</option>
+      <option value="personalizado">🏷️ Personalizado (elegí un nombre)</option>
     </select>
+    <div id="cuenta-tipo-custom-wrap" style="display:none">
+      <input class="field-input" id="cuenta-tipo-custom" type="text" placeholder="Ej: Préstamos, Criptomonedas..." maxlength="24">
+    </div>
     <div class="field-label">Saldo inicial ($)</div>
     <input class="field-input" id="cuenta-saldo-input" type="text" inputmode="decimal" placeholder="0,00">
     <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-top:-10px;margin-bottom:16px;cursor:pointer">
@@ -697,6 +731,7 @@ function load(){
   try{ cuentas=JSON.parse(localStorage.getItem('mf4_cuentas')||'[]'); }catch(e){ cuentas=[]; }
   try{ presupuestos=JSON.parse(localStorage.getItem('mf4_presup')||'{}'); }catch(e){ presupuestos={}; }
   try{ const c=JSON.parse(localStorage.getItem('mf_cats')||'null'); if(c) CATS_DATA=c; }catch(e){}
+  migrateCats();
   try{ const t=JSON.parse(localStorage.getItem('mf_tarjeta_cfg')||'null'); if(t) tarjetaConfig=t; }catch(e){}
   isDark=localStorage.getItem('mf_dark')==='1';
   alarmOn=localStorage.getItem('mf_alarm_on')==='1';
@@ -710,7 +745,20 @@ const savePresups=()=>{ localStorage.setItem('mf4_presup',JSON.stringify(presupu
 const saveCats=()=>{ localStorage.setItem('mf_cats',JSON.stringify(CATS_DATA)); };
 const saveTarjetaConfig=()=>{ localStorage.setItem('mf_tarjeta_cfg',JSON.stringify(tarjetaConfig)); };
 
-function getCat(type){ return {...CATS_META[type], sub:CATS_DATA[type]}; }
+function migrateCats(){
+  Object.keys(CATS_DATA).forEach(type=>{
+    CATS_DATA[type]=(CATS_DATA[type]||[]).map(item=>typeof item==='string'?{name:item,subs:[]}:{name:item.name,subs:item.subs||[]});
+  });
+}
+function flattenCat(type){
+  const leaves=[];
+  (CATS_DATA[type]||[]).forEach(item=>{
+    if(item.subs&&item.subs.length) item.subs.forEach(s=>leaves.push(`${item.name} · ${s}`));
+    else leaves.push(item.name);
+  });
+  return leaves;
+}
+function getCat(type){ return {...CATS_META[type], sub:flattenCat(type)}; }
 function parseAmt(str){
   if(!str) return 0;
   let s=String(str).trim();
@@ -767,9 +815,10 @@ function navTo(page){
 function openSettings(){ updateSettingsCounts(); updateTarjetaConfigSub(); document.getElementById('settings-overlay').classList.add('open'); }
 function closeSettings(e){ if(e.target===document.getElementById('settings-overlay')) document.getElementById('settings-overlay').classList.remove('open'); }
 function updateSettingsCounts(){
-  document.getElementById('sub-count-ingresos').textContent=CATS_DATA.ingresos.length+' categorías';
-  document.getElementById('sub-count-gastos').textContent=CATS_DATA.gastos.length+' categorías';
+  document.getElementById('sub-count-ingresos').textContent=flattenCat('ingresos').length+' categorías';
+  document.getElementById('sub-count-gastos').textContent=flattenCat('gastos').length+' categorías';
   document.getElementById('sub-count-tarjetas').textContent=CATS_DATA.tarjetas.length+' tarjetas';
+  document.getElementById('sub-count-cuentas').textContent=cuentas.length+(cuentas.length===1?' cuenta':' cuentas');
 }
 function updateTarjetaConfigSub(){ document.getElementById('tarjeta-config-sub').textContent=`Cierre día ${tarjetaConfig.diacierre} · Vence día ${tarjetaConfig.diavencimiento}`; }
 
@@ -789,12 +838,12 @@ function toggleBackup(){ backupOn=!backupOn; localStorage.setItem('mf_backup_on'
 function applyBackup(){ document.getElementById('backup-toggle')?.classList.toggle('on',backupOn); const ba=document.getElementById('backup-actions'); if(ba) ba.style.display=backupOn?'block':'none'; }
 function doManualBackup(){ const d={version:4,date:new Date().toISOString(),entries,cuentas,presupuestos,cats:CATS_DATA,tarjetaConfig}; const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'}); const u=URL.createObjectURL(b),a=document.createElement('a'); a.href=u; a.download=`mis-finanzas-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(u); showToast('✓ Backup descargado'); }
 function doImportBackup(){ document.getElementById('import-file').click(); }
-function importBackupFile(event){ const file=event.target.files[0]; if(!file) return; const r=new FileReader(); r.onload=e=>{ try{ const d=JSON.parse(e.target.result); if(d.entries) entries=d.entries; if(d.cuentas) cuentas=d.cuentas; if(d.presupuestos) presupuestos=d.presupuestos; if(d.cats) CATS_DATA=d.cats; if(d.tarjetaConfig) tarjetaConfig=d.tarjetaConfig; save(); saveCuentas(); savePresups(); saveCats(); saveTarjetaConfig(); updateAll(); showToast('✓ Backup restaurado'); }catch(err){ showToast('Error al leer el backup'); } }; r.readAsText(file); event.target.value=''; }
+function importBackupFile(event){ const file=event.target.files[0]; if(!file) return; const r=new FileReader(); r.onload=e=>{ try{ const d=JSON.parse(e.target.result); if(d.entries) entries=d.entries; if(d.cuentas) cuentas=d.cuentas; if(d.presupuestos) presupuestos=d.presupuestos; if(d.cats) CATS_DATA=d.cats; if(d.tarjetaConfig) tarjetaConfig=d.tarjetaConfig; migrateCats(); save(); saveCuentas(); savePresups(); saveCats(); saveTarjetaConfig(); updateAll(); showToast('✓ Backup restaurado'); }catch(err){ showToast('Error al leer el backup'); } }; r.readAsText(file); event.target.value=''; }
 
 // ── SUB PANEL ──
 function openSubPanel(panel){
   currentSubPanel=panel;
-  const titles={'cat-ingresos':'Categorías de ingresos','cat-gastos':'Categorías de gastos','cat-tarjetas':'Tarjetas','tarjeta-config':'Configuración de tarjeta'};
+  const titles={'cat-ingresos':'Categorías de ingresos','cat-gastos':'Categorías de gastos','cat-tarjetas':'Tarjetas','tarjeta-config':'Configuración de tarjeta','cuentas':'Mis cuentas'};
   document.getElementById('sub-panel-title').textContent=titles[panel]||'';
   renderSubPanelContent(panel);
   document.getElementById('sub-overlay').classList.add('open');
@@ -813,10 +862,41 @@ function renderSubPanelContent(panel){
         <div style="font-size:11px;color:var(--text4);font-weight:600;margin-bottom:6px">CÓMO FUNCIONA</div>
         <div style="font-size:13px;color:var(--text2);line-height:1.7">Cierre día <b>${tarjetaConfig.diacierre}</b> → pago vence día <b>${tarjetaConfig.diavencimiento}</b> del mes siguiente.<br>Cada cuota de una compra en cuotas se aplica al mes siguiente del cierre.</div>
       </div>`;
+  } else if(panel==='cuentas'){
+    renderCuentasEditor();
   } else {
     const typeMap={'cat-ingresos':'ingresos','cat-gastos':'gastos','cat-tarjetas':'tarjetas'};
     renderCatEditor(typeMap[panel]);
   }
+}
+
+function renderCuentasEditor(){
+  const container=document.getElementById('sub-panel-content');
+  if(!cuentas.length){
+    container.innerHTML=`<div style="font-size:13px;color:var(--text4);padding:10px 4px 16px">Todavía no agregaste ninguna cuenta.</div>
+      <div class="add-item-row"><button class="add-item-btn" style="width:100%" onclick="closeSubPanelDirect();openAddCuenta()">+ Agregar cuenta</button></div>`;
+    return;
+  }
+  container.innerHTML=`
+    <div id="cuentas-edit-list">${cuentas.map(cu=>`
+      <div class="edit-list-item">
+        <span class="edit-item-name">${TIPO_ICONS[cu.tipo]||'📂'} ${cu.nombre} <span style="color:var(--text4);font-weight:400">· ${fmt(saldoCuenta(cu))}</span></span>
+        <button class="edit-item-btn edit-item-edit" onclick="openEditCuenta('${cu.id}')"><i class="ti ti-pencil" style="font-size:15px"></i></button>
+        <button class="edit-item-btn edit-item-del" onclick="deleteCuentaFromSettings('${cu.id}')"><i class="ti ti-trash" style="font-size:15px"></i></button>
+      </div>`).join('')}
+    </div>
+    <div class="add-item-row" style="margin-top:10px">
+      <button class="add-item-btn" style="width:100%" onclick="closeSubPanelDirect();openAddCuenta()">+ Agregar cuenta</button>
+    </div>`;
+}
+function deleteCuentaFromSettings(id){
+  if(!confirm('¿Eliminar esta cuenta?')) return;
+  cuentas=cuentas.filter(c=>c.id!==id);
+  saveCuentas();
+  renderCuentasEditor();
+  updateSettingsCounts();
+  if(document.getElementById('page-cuentas').classList.contains('active')) renderCuentas();
+  showToast('Cuenta eliminada');
 }
 
 function saveTarjetaCfg(){
@@ -827,11 +907,23 @@ function saveTarjetaCfg(){
 function renderCatEditor(type){
   const items=CATS_DATA[type];
   document.getElementById('sub-panel-content').innerHTML=`
-    <div id="cat-edit-list">${items.map((s,i)=>`
-      <div class="edit-list-item">
-        <span class="edit-item-name">${s}</span>
-        <button class="edit-item-btn edit-item-edit" onclick="renameCat('${type}',${i})"><i class="ti ti-pencil" style="font-size:15px"></i></button>
-        <button class="edit-item-btn edit-item-del" onclick="deleteCat('${type}',${i})"><i class="ti ti-trash" style="font-size:15px"></i></button>
+    <div id="cat-edit-list">${items.map((cat,ci)=>`
+      <div class="cat-group">
+        <div class="cat-group-header">
+          <span class="edit-item-name">${cat.name}</span>
+          <button class="edit-item-btn-sm" style="background:#dbeafe;color:#2563eb" onclick="renameCat('${type}',${ci})" title="Renombrar"><i class="ti ti-pencil" style="font-size:12px"></i></button>
+          <button class="edit-item-btn-sm" style="background:#fee2e2;color:#dc2626" onclick="deleteCat('${type}',${ci})" title="Eliminar"><i class="ti ti-trash" style="font-size:12px"></i></button>
+        </div>
+        ${cat.subs.map((s,si)=>`
+          <div class="cat-sub-item">
+            <span class="edit-item-name">${s}</span>
+            <button class="edit-item-btn-sm" style="background:#dbeafe;color:#2563eb" onclick="renameSubCat('${type}',${ci},${si})" title="Renombrar"><i class="ti ti-pencil" style="font-size:12px"></i></button>
+            <button class="edit-item-btn-sm" style="background:#fee2e2;color:#dc2626" onclick="deleteSubCat('${type}',${ci},${si})" title="Eliminar"><i class="ti ti-trash" style="font-size:12px"></i></button>
+          </div>`).join('')}
+        <div class="cat-sub-add-row">
+          <input class="cat-sub-add-input" id="sub-input-${type}-${ci}" type="text" placeholder="Nueva subcategoría de ${cat.name}..." maxlength="30">
+          <button class="cat-sub-add-btn" onclick="addSubCat('${type}',${ci})">+ Sub</button>
+        </div>
       </div>`).join('')}
     </div>
     <div class="add-item-row">
@@ -839,35 +931,82 @@ function renderCatEditor(type){
       <button class="add-item-btn" onclick="addCat('${type}')">Agregar</button>
     </div>`;
 }
-function deleteCat(type,idx){ if(CATS_DATA[type].length<=1){ showToast('Debe quedar al menos una'); return; } CATS_DATA[type].splice(idx,1); saveCats(); renderSubPanelContent(currentSubPanel); updateSettingsCounts(); showToast('Eliminada'); }
-function addCat(type){ const inp=document.getElementById('new-cat-input'),val=inp.value.trim(); if(!val){ inp.focus(); return; } if(CATS_DATA[type].includes(val)){ showToast('Ya existe'); return; } CATS_DATA[type].push(val); saveCats(); inp.value=''; renderSubPanelContent(currentSubPanel); updateSettingsCounts(); showToast('✓ Categoría agregada'); }
+
+function updateEntriesLeafRename(type,oldLeaf,newLeaf){
+  entries.forEach(e=>{ if(e.type===type&&e.sub===oldLeaf) e.sub=newLeaf; });
+  if(type==='gastos'){
+    Object.keys(presupuestos).forEach(key=>{
+      if(presupuestos[key]&&Object.prototype.hasOwnProperty.call(presupuestos[key],oldLeaf)){
+        presupuestos[key][newLeaf]=presupuestos[key][oldLeaf];
+        delete presupuestos[key][oldLeaf];
+      }
+    });
+  }
+}
+
+function deleteCat(type,idx){
+  if(CATS_DATA[type].length<=1){ showToast('Debe quedar al menos una'); return; }
+  const cat=CATS_DATA[type][idx];
+  if(cat.subs&&cat.subs.length){ if(!confirm(`Esto también elimina las ${cat.subs.length} subcategorías de "${cat.name}". ¿Continuar?`)) return; }
+  CATS_DATA[type].splice(idx,1);
+  saveCats(); renderSubPanelContent(currentSubPanel); updateSettingsCounts(); showToast('Eliminada');
+}
+function addCat(type){
+  const inp=document.getElementById('new-cat-input'),val=inp.value.trim();
+  if(!val){ inp.focus(); return; }
+  if(CATS_DATA[type].some(c=>c.name===val)){ showToast('Ya existe'); return; }
+  CATS_DATA[type].push({name:val,subs:[]});
+  saveCats(); inp.value=''; renderSubPanelContent(currentSubPanel); updateSettingsCounts();
+  showToast('✓ Categoría agregada');
+}
 function renameCat(type,idx){
-  const oldName=CATS_DATA[type][idx];
-  const newName=prompt('Editar categoría',oldName);
+  const cat=CATS_DATA[type][idx];
+  const newName=prompt('Editar categoría',cat.name);
   if(newName===null) return;
   const trimmed=newName.trim();
   if(!trimmed){ showToast('El nombre no puede estar vacío'); return; }
-  if(trimmed!==oldName && CATS_DATA[type].includes(trimmed)){ showToast('Ya existe una categoría con ese nombre'); return; }
-  if(trimmed===oldName) return;
-  CATS_DATA[type][idx]=trimmed;
-  // actualiza los movimientos ya cargados que usaban el nombre anterior
-  entries.forEach(e=>{ if(e.type===type && e.sub===oldName) e.sub=trimmed; });
-  save();
-  // actualiza los presupuestos guardados con el nombre anterior
-  if(type==='gastos'){
-    Object.keys(presupuestos).forEach(key=>{
-      if(presupuestos[key] && Object.prototype.hasOwnProperty.call(presupuestos[key],oldName)){
-        presupuestos[key][trimmed]=presupuestos[key][oldName];
-        delete presupuestos[key][oldName];
-      }
-    });
-    savePresups();
-  }
-  saveCats();
+  if(trimmed!==cat.name && CATS_DATA[type].some(c=>c.name===trimmed)){ showToast('Ya existe una categoría con ese nombre'); return; }
+  if(trimmed===cat.name) return;
+  const oldName=cat.name;
+  if(cat.subs&&cat.subs.length) cat.subs.forEach(s=>updateEntriesLeafRename(type,`${oldName} · ${s}`,`${trimmed} · ${s}`));
+  else updateEntriesLeafRename(type,oldName,trimmed);
+  cat.name=trimmed;
+  save(); savePresups(); saveCats();
   renderSubPanelContent(currentSubPanel);
   updateSettingsCounts();
   updateAll();
   showToast('✓ Categoría actualizada');
+}
+function addSubCat(type,catIdx){
+  const inp=document.getElementById(`sub-input-${type}-${catIdx}`),val=inp.value.trim();
+  if(!val){ inp.focus(); return; }
+  const cat=CATS_DATA[type][catIdx];
+  if(cat.subs.includes(val)){ showToast('Ya existe esa subcategoría'); return; }
+  cat.subs.push(val);
+  saveCats(); renderSubPanelContent(currentSubPanel); updateSettingsCounts();
+  showToast('✓ Subcategoría agregada');
+}
+function renameSubCat(type,catIdx,subIdx){
+  const cat=CATS_DATA[type][catIdx];
+  const oldSub=cat.subs[subIdx];
+  const newSub=prompt('Editar subcategoría',oldSub);
+  if(newSub===null) return;
+  const trimmed=newSub.trim();
+  if(!trimmed){ showToast('El nombre no puede estar vacío'); return; }
+  if(trimmed!==oldSub && cat.subs.includes(trimmed)){ showToast('Ya existe esa subcategoría'); return; }
+  if(trimmed===oldSub) return;
+  updateEntriesLeafRename(type,`${cat.name} · ${oldSub}`,`${cat.name} · ${trimmed}`);
+  cat.subs[subIdx]=trimmed;
+  save(); savePresups(); saveCats();
+  renderSubPanelContent(currentSubPanel);
+  updateSettingsCounts();
+  updateAll();
+  showToast('✓ Subcategoría actualizada');
+}
+function deleteSubCat(type,catIdx,subIdx){
+  CATS_DATA[type][catIdx].subs.splice(subIdx,1);
+  saveCats(); renderSubPanelContent(currentSubPanel); updateSettingsCounts();
+  showToast('Subcategoría eliminada');
 }
 
 // ── TOTALS & HISTORY ──
@@ -937,9 +1076,33 @@ function renderHistoryItem(e,showYear){
     </div>`;
 }
 
+let searchQuery='';
+function onSearchInput(val){
+  searchQuery=val.trim().toLowerCase();
+  document.getElementById('search-clear-btn').style.display=searchQuery?'flex':'none';
+  updateHistory();
+}
+function clearSearch(){
+  searchQuery='';
+  document.getElementById('search-input').value='';
+  document.getElementById('search-clear-btn').style.display='none';
+  updateHistory();
+}
+function matchesSearch(e,q){
+  const cuentaNombre=cuentas.find(c=>c.id===e.cuentaId)?.nombre||'';
+  const campos=[e.desc,e.sub,e.otraCuenta,cuentaNombre,String(e.amount)].filter(Boolean).join(' ').toLowerCase();
+  return campos.includes(q);
+}
 function updateHistory(){
-  const es=getFiltered().slice().reverse();
   const el=document.getElementById('history-list');
+  let es;
+  if(searchQuery){
+    es=entries.filter(e=>e.view===currentView&&matchesSearch(e,searchQuery)).slice().sort((a,b)=>b.ts-a.ts);
+    if(!es.length){ el.innerHTML='<div class="history-empty"><i class="ti ti-search-off"></i>No se encontraron movimientos</div>'; return; }
+    el.innerHTML=es.map(e=>renderHistoryItem(e,true)).join('');
+    return;
+  }
+  es=getFiltered().slice().reverse();
   if(!es.length){ el.innerHTML='<div class="history-empty"><i class="ti ti-receipt-off"></i>Sin movimientos este mes</div>'; return; }
   el.innerHTML=es.map(e=>renderHistoryItem(e,true)).join('');
 }
@@ -1046,7 +1209,7 @@ function renderCuentaCard(cu){
     const deudaTotal = Math.max(0,deudaBruta-pagos);
     sub=`Sin cerrar ${fmt(sinCerrar)} · Deuda ${fmt(deudaTotal)}`;
   } else {
-    sub=cu.tipo;
+    sub='';
   }
   const color=saldoActual>=0?'#16a34a':'#dc2626';
   return `<div class="cuenta-card" style="${visible?'':'opacity:0.55'}" onclick="openCuentaDetail('${cu.id}')">
@@ -1058,9 +1221,9 @@ function renderCuentaCard(cu){
     <div class="cuenta-row2">
       <div class="cuenta-tipo">${sub}</div>
       <div class="cuenta-actions" onclick="event.stopPropagation()">
-        <button class="cuenta-mini-btn" onclick="toggleCuentaVisible('${cu.id}')" title="${visible?'Excluir del balance disponible':'Incluir en el balance disponible'}"><i class="ti ${visible?'ti-eye':'ti-eye-off'}" style="font-size:12px;color:${visible?'#1B6B4A':'var(--text4)'}"></i></button>
-        ${cu.tipo==='tarjeta'?`<button class="cuenta-mini-btn" style="background:#d1fae5" onclick="openPagarTarjeta('${cu.id}')" title="Pagar tarjeta"><i class="ti ti-cash" style="font-size:12px;color:#059669"></i></button>`:''}
-        <button class="cuenta-mini-btn" onclick="deleteCuenta('${cu.id}')" title="Eliminar"><i class="ti ti-trash" style="font-size:12px;color:#dc2626"></i></button>
+        <button class="cuenta-mini-btn" onclick="toggleCuentaVisible('${cu.id}')" title="${visible?'Excluir del balance disponible':'Incluir en el balance disponible'}"><i class="ti ${visible?'ti-eye':'ti-eye-off'}" style="font-size:11px;color:${visible?'#1B6B4A':'var(--text4)'}"></i></button>
+        ${cu.tipo==='tarjeta'?`<button class="cuenta-mini-btn" style="background:#d1fae5" onclick="openPagarTarjeta('${cu.id}')" title="Pagar tarjeta"><i class="ti ti-cash" style="font-size:11px;color:#059669"></i></button>`:''}
+        <button class="cuenta-mini-btn" onclick="deleteCuenta('${cu.id}')" title="Eliminar"><i class="ti ti-trash" style="font-size:11px;color:#dc2626"></i></button>
       </div>
     </div>
   </div>`;
@@ -1116,20 +1279,57 @@ function toggleCuentaVisible(id){
   renderCuentas();
 }
 
+const TIPO_BASE=['efectivo','banco','tarjeta','ahorro','inversion','otro'];
+
+function onCuentaTipoChangeUI(){
+  const v=document.getElementById('cuenta-tipo-select').value;
+  document.getElementById('cuenta-tipo-custom-wrap').style.display=v==='personalizado'?'block':'none';
+  if(v==='personalizado') setTimeout(()=>document.getElementById('cuenta-tipo-custom').focus(),150);
+}
+
 function openAddCuenta(){
   editingCuentaId=null;
   document.getElementById('cuenta-modal-title').textContent='Agregar cuenta';
   document.getElementById('cuenta-nombre-input').value='';
   document.getElementById('cuenta-tipo-select').value='efectivo';
+  document.getElementById('cuenta-tipo-custom').value='';
+  document.getElementById('cuenta-tipo-custom-wrap').style.display='none';
   document.getElementById('cuenta-saldo-input').value='';
   document.getElementById('cuenta-es-deuda').checked=false;
   document.getElementById('cuenta-modal-overlay').classList.add('open');
 }
 
+function openEditCuenta(id){
+  const cu=cuentas.find(c=>c.id===id);
+  if(!cu) return;
+  editingCuentaId=id;
+  document.getElementById('cuenta-modal-title').textContent='Editar cuenta';
+  document.getElementById('cuenta-nombre-input').value=cu.nombre;
+  if(TIPO_BASE.includes(cu.tipo)){
+    document.getElementById('cuenta-tipo-select').value=cu.tipo;
+    document.getElementById('cuenta-tipo-custom').value='';
+    document.getElementById('cuenta-tipo-custom-wrap').style.display='none';
+  } else {
+    document.getElementById('cuenta-tipo-select').value='personalizado';
+    document.getElementById('cuenta-tipo-custom').value=cu.tipo;
+    document.getElementById('cuenta-tipo-custom-wrap').style.display='block';
+  }
+  document.getElementById('cuenta-saldo-input').value=String(Math.abs(cu.saldoInicial||0)).replace('.',',');
+  document.getElementById('cuenta-es-deuda').checked=(cu.saldoInicial||0)<0;
+  document.getElementById('cuenta-modal-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('cuenta-nombre-input').focus(),300);
+}
+
 function saveCuenta(){
   const nombre=document.getElementById('cuenta-nombre-input').value.trim();
   if(!nombre){ showToast('Ingresá un nombre'); return; }
-  const tipo=document.getElementById('cuenta-tipo-select').value;
+  let tipo=document.getElementById('cuenta-tipo-select').value;
+  if(tipo==='personalizado'){
+    const custom=document.getElementById('cuenta-tipo-custom').value.trim();
+    if(!custom){ showToast('Ingresá un nombre para el tipo de cuenta'); document.getElementById('cuenta-tipo-custom').focus(); return; }
+    if(TIPO_BASE.includes(custom.toLowerCase())){ showToast('Ese nombre ya existe como tipo, elegí otro'); return; }
+    tipo=custom;
+  }
   let saldoInicial=parseAmt(document.getElementById('cuenta-saldo-input').value);
   if(document.getElementById('cuenta-es-deuda').checked) saldoInicial=-Math.abs(saldoInicial);
   const id=editingCuentaId||('c'+Date.now());
@@ -1137,7 +1337,11 @@ function saveCuenta(){
   else cuentas.push({id,nombre,tipo,saldoInicial,visible:true});
   saveCuentas();
   document.getElementById('cuenta-modal-overlay').classList.remove('open');
-  renderCuentas();
+  editingCuentaId=null;
+  if(document.getElementById('page-cuentas').classList.contains('active')) renderCuentas();
+  if(currentSubPanel==='cuentas') renderCuentasEditor();
+  updateSettingsCounts();
+  updateDisponible();
   showToast('✓ Cuenta guardada');
 }
 
@@ -1237,7 +1441,7 @@ function saveTransfer(){
 
 // ── PRESUPUESTOS ──
 function renderPresupuestos(){
-  const allCats=[...CATS_DATA.gastos];
+  const allCats=flattenCat('gastos');
   const month=currentMonth, year=currentYear;
   const presupKey=`${year}-${month}`;
   const gastosPorCat={};
