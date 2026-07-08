@@ -231,6 +231,9 @@ body{background:var(--bg);color:var(--text1);transition:background .2s,color .2s
 .add-item-input:focus{border-color:#1B6B4A}
 .add-item-emoji{width:52px;padding:11px 8px;border-radius:12px;border:1.5px solid var(--border);font-size:20px;text-align:center;background:var(--bg2);outline:none}
 .add-item-btn{padding:11px 18px;border-radius:12px;background:#1B6B4A;color:white;border:none;font-size:14px;font-weight:600;cursor:pointer}
+.subcat-link-btn{background:var(--bg3);color:var(--text3);border:none;border-radius:8px;padding:6px 10px;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.subcat-link-btn:active{background:var(--bg4)}
+.subcat-back{display:flex;align-items:center;gap:6px;background:none;border:none;color:#1B6B4A;font-size:14px;font-weight:600;cursor:pointer;padding:4px 0 12px}
 .tarjeta-config-label{font-size:12px;color:var(--text4);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;margin-top:14px}
 .tarjeta-config-field select{width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;color:var(--text1);background:var(--bg2);outline:none;-webkit-appearance:none}
 .alarm-time-input{padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;color:var(--text1);background:var(--bg2);outline:none;width:110px;text-align:center}
@@ -684,6 +687,8 @@ body{background:var(--bg);color:var(--text1);transition:background .2s,color .2s
     <input class="field-input" id="desc-input" type="text" placeholder="Ej: Supermercado, sueldo...">
     <div class="field-label">Categoría</div>
     <div class="cat-pills" id="cat-pills"></div>
+    <div class="field-label" id="subcat-field-label" style="display:none">Subcategoría (opcional)</div>
+    <div class="cat-pills" id="subcat-pills"></div>
     <div class="field-label" id="cuenta-field-label">Cuenta</div>
     <div class="cuenta-pills" id="cuenta-pills"></div>
     <div class="cuotas-wrap" id="cuotas-wrap">
@@ -928,6 +933,9 @@ let CATS_DATA={
   tarjetas:['Visa','Mastercard','Débito','Naranja','Otro']
 };
 
+// SUBCATS[type][nombreCategoria] = [subcategorías...]
+let SUBCATS={ingresos:{},gastos:{},ahorro:{},tarjetas:{}};
+
 let TIPOS_CUENTA=[
   {id:'efectivo',label:'Efectivo',icon:'💵',esTarjeta:false},
   {id:'banco',label:'Banco',icon:'🏦',esTarjeta:false},
@@ -940,9 +948,10 @@ let TIPOS_CUENTA=[
 
 let entries=[], cuentas=[], presupuestos={}, tarjetaConfig={diacierre:25,diavencimiento:7};
 let currentType='gastos', currentMonth=new Date().getMonth(), currentYear=new Date().getFullYear();
-let selectedSub='', cuotasCount=1, montoSigno=1, saldoSigno=1;
+let selectedSub='', selectedSubcat=null, cuotasCount=1, montoSigno=1, saldoSigno=1;
 let isDark=false, alarmOn=false, alarmTime='20:00', backupOn=false, alarmTimer=null;
 let currentSubPanel='', selectedCuentaId=null;
+let currentSubcatType=null, currentSubcatCat=null;
 let editingTs=null, editingCuentaId=null, editingPresupCat=null;
 let cuentasAgrupadas=true;
 
@@ -952,6 +961,7 @@ function load(){
   try{cuentas=JSON.parse(localStorage.getItem('mf5_cuentas')||'[]');}catch(e){cuentas=[];}
   try{presupuestos=JSON.parse(localStorage.getItem('mf5_presup')||'{}');}catch(e){presupuestos={};}
   try{const c=JSON.parse(localStorage.getItem('mf_cats')||'null');if(c)CATS_DATA=c;}catch(e){}
+  try{const sc=JSON.parse(localStorage.getItem('mf_subcats')||'null');if(sc)SUBCATS=sc;}catch(e){}
   try{const t=JSON.parse(localStorage.getItem('mf_tarjeta_cfg')||'null');if(t)tarjetaConfig=t;}catch(e){}
   try{const ti=JSON.parse(localStorage.getItem('mf5_tipos')||'null');if(ti)TIPOS_CUENTA=ti;}catch(e){}
   isDark=localStorage.getItem('mf_dark')==='1';
@@ -965,8 +975,12 @@ const save=()=>localStorage.setItem('mf5_entries',JSON.stringify(entries));
 const saveCuentas=()=>localStorage.setItem('mf5_cuentas',JSON.stringify(cuentas));
 const savePresups=()=>localStorage.setItem('mf5_presup',JSON.stringify(presupuestos));
 const saveCats=()=>localStorage.setItem('mf_cats',JSON.stringify(CATS_DATA));
+const saveSubcats=()=>localStorage.setItem('mf_subcats',JSON.stringify(SUBCATS));
 const saveTarjetaConfig=()=>localStorage.setItem('mf_tarjeta_cfg',JSON.stringify(tarjetaConfig));
 const saveTipos=()=>localStorage.setItem('mf5_tipos',JSON.stringify(TIPOS_CUENTA));
+function getSubcats(type,cat){return (SUBCATS[type]&&SUBCATS[type][cat])||[];}
+function jsStr(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
+
 
 function getCat(type){return {...CATS_META[type],sub:CATS_DATA[type]};}
 function getTipo(id){return TIPOS_CUENTA.find(t=>t.id===id)||{id:'otro',label:'Otro',icon:'📂',esTarjeta:false};}
@@ -1034,9 +1048,9 @@ function applyAlarm(){
 // ── BACKUP ──
 function toggleBackup(){backupOn=!backupOn;localStorage.setItem('mf_backup_on',backupOn?'1':'0');applyBackup();}
 function applyBackup(){document.getElementById('backup-toggle')?.classList.toggle('on',backupOn);const ba=document.getElementById('backup-actions');if(ba)ba.style.display=backupOn?'block':'none';}
-function doManualBackup(){const d={version:5,date:new Date().toISOString(),entries,cuentas,presupuestos,cats:CATS_DATA,tarjetaConfig,tipos:TIPOS_CUENTA};const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=`mis-finanzas-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(u);showToast('✓ Backup descargado');}
+function doManualBackup(){const d={version:5,date:new Date().toISOString(),entries,cuentas,presupuestos,cats:CATS_DATA,subcats:SUBCATS,tarjetaConfig,tipos:TIPOS_CUENTA};const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=`mis-finanzas-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(u);showToast('✓ Backup descargado');}
 function doImportBackup(){document.getElementById('import-file').click();}
-function importBackupFile(event){const file=event.target.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(d.entries)entries=d.entries;if(d.cuentas)cuentas=d.cuentas;if(d.presupuestos)presupuestos=d.presupuestos;if(d.cats)CATS_DATA=d.cats;if(d.tarjetaConfig)tarjetaConfig=d.tarjetaConfig;if(d.tipos)TIPOS_CUENTA=d.tipos;save();saveCuentas();savePresups();saveCats();saveTarjetaConfig();saveTipos();updateAll();showToast('✓ Backup restaurado');}catch(err){showToast('Error al leer el backup');}};r.readAsText(file);event.target.value='';}
+function importBackupFile(event){const file=event.target.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(d.entries)entries=d.entries;if(d.cuentas)cuentas=d.cuentas;if(d.presupuestos)presupuestos=d.presupuestos;if(d.cats)CATS_DATA=d.cats;if(d.subcats)SUBCATS=d.subcats;if(d.tarjetaConfig)tarjetaConfig=d.tarjetaConfig;if(d.tipos)TIPOS_CUENTA=d.tipos;save();saveCuentas();savePresups();saveCats();saveSubcats();saveTarjetaConfig();saveTipos();updateAll();showToast('✓ Backup restaurado');}catch(err){showToast('Error al leer el backup');}};r.readAsText(file);event.target.value='';}
 
 // ── SUB PANEL ──
 function openSubPanel(panel){
@@ -1086,19 +1100,80 @@ function saveTarjetaCfg(){tarjetaConfig={diacierre:parseInt(document.getElementB
 function renderCatEditor(type){
   const items=CATS_DATA[type];
   document.getElementById('sub-panel-content').innerHTML=`
-    <div id="cat-edit-list">${items.map((s,i)=>`
-      <div class="edit-list-item">
+    <div id="cat-edit-list">${items.map((s,i)=>{
+      const n=getSubcats(type,s).length;
+      return `<div class="edit-list-item">
         <span class="edit-item-name">${s}</span>
+        <button class="subcat-link-btn" onclick="openSubcatPanel('${type}','${jsStr(s)}')">Subcategorías${n?` (${n})`:''}</button>
         <button class="edit-item-del" onclick="deleteCat('${type}',${i})"><i class="ti ti-trash" style="font-size:14px"></i></button>
-      </div>`).join('')}
+      </div>`;
+    }).join('')}
     </div>
     <div class="add-item-row">
       <input class="add-item-input" id="new-cat-input" type="text" placeholder="Nueva categoría..." maxlength="30">
       <button class="add-item-btn" onclick="addCat('${type}')">Agregar</button>
     </div>`;
 }
-function deleteCat(type,idx){if(CATS_DATA[type].length<=1){showToast('Debe quedar al menos una');return;}CATS_DATA[type].splice(idx,1);saveCats();renderSubPanelContent(currentSubPanel);updateSettingsCounts();showToast('Eliminada');}
+function deleteCat(type,idx){
+  if(CATS_DATA[type].length<=1){showToast('Debe quedar al menos una');return;}
+  const catName=CATS_DATA[type][idx];
+  CATS_DATA[type].splice(idx,1);
+  if(SUBCATS[type])delete SUBCATS[type][catName];
+  saveCats();saveSubcats();renderSubPanelContent(currentSubPanel);updateSettingsCounts();showToast('Eliminada');
+}
 function addCat(type){const inp=document.getElementById('new-cat-input'),val=inp.value.trim();if(!val){inp.focus();return;}if(CATS_DATA[type].includes(val)){showToast('Ya existe');return;}CATS_DATA[type].push(val);saveCats();inp.value='';renderSubPanelContent(currentSubPanel);updateSettingsCounts();showToast('✓ Categoría agregada');}
+
+// ── SUBCATEGORÍAS ──
+function openSubcatPanel(type,cat){
+  currentSubcatType=type;currentSubcatCat=cat;currentSubPanel='subcat-edit';
+  document.getElementById('sub-panel-title').textContent='Subcategorías de '+cat;
+  renderSubcatEditor();
+  document.getElementById('sub-overlay').classList.add('open');
+}
+function renderSubcatEditor(){
+  const type=currentSubcatType,cat=currentSubcatCat;
+  const items=getSubcats(type,cat);
+  const catLabels={ingresos:'Categorías de ingresos',gastos:'Categorías de gastos',tarjetas:'Tipos de tarjeta'};
+  document.getElementById('sub-panel-content').innerHTML=`
+    <button class="subcat-back" onclick="backToCatEditor()"><i class="ti ti-arrow-left"></i> Volver a ${catLabels[type]||'categorías'}</button>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:14px">Subcategorías dentro de <b>${cat}</b>. Son opcionales: si no cargás ninguna, se sigue usando solo la categoría.</div>
+    <div id="subcat-edit-list">${items.length?items.map((s,i)=>`
+      <div class="edit-list-item">
+        <span class="edit-item-name">${s}</span>
+        <button class="edit-item-del" onclick="deleteSubcat(${i})"><i class="ti ti-trash" style="font-size:14px"></i></button>
+      </div>`).join(''):'<div style="color:var(--text4);padding:8px 0;font-size:13px">Sin subcategorías todavía</div>'}
+    </div>
+    <div class="add-item-row">
+      <input class="add-item-input" id="new-subcat-input" type="text" placeholder="Nueva subcategoría..." maxlength="30">
+      <button class="add-item-btn" onclick="addSubcat()">Agregar</button>
+    </div>`;
+}
+function backToCatEditor(){
+  const type=currentSubcatType;
+  currentSubPanel='cat-'+type;
+  const titles={'ingresos':'Categorías de ingresos','gastos':'Categorías de gastos','tarjetas':'Tipos de tarjeta'};
+  document.getElementById('sub-panel-title').textContent=titles[type]||'Categorías';
+  renderCatEditor(type);
+}
+function addSubcat(){
+  const inp=document.getElementById('new-subcat-input');
+  const val=inp.value.trim();
+  if(!val){inp.focus();return;}
+  const type=currentSubcatType,cat=currentSubcatCat;
+  if(!SUBCATS[type])SUBCATS[type]={};
+  if(!SUBCATS[type][cat])SUBCATS[type][cat]=[];
+  if(SUBCATS[type][cat].includes(val)){showToast('Ya existe');return;}
+  SUBCATS[type][cat].push(val);
+  saveSubcats();inp.value='';
+  renderSubcatEditor();
+  showToast('✓ Subcategoría agregada');
+}
+function deleteSubcat(idx){
+  const type=currentSubcatType,cat=currentSubcatCat;
+  if(SUBCATS[type]&&SUBCATS[type][cat]){SUBCATS[type][cat].splice(idx,1);saveSubcats();}
+  renderSubcatEditor();
+  showToast('Eliminada');
+}
 function deleteTipo(idx){if(TIPOS_CUENTA.length<=1){showToast('Debe quedar al menos uno');return;}TIPOS_CUENTA.splice(idx,1);saveTipos();renderSubPanelContent('tipos-cuenta');updateSettingsCounts();showToast('Eliminado');}
 function addTipo(){const iconInp=document.getElementById('new-tipo-icon'),lblInp=document.getElementById('new-tipo-label');const icon=iconInp.value.trim()||'📂',label=lblInp.value.trim();if(!label){lblInp.focus();return;}const id='t'+Date.now();TIPOS_CUENTA.push({id,label,icon,esTarjeta:false});saveTipos();iconInp.value='';lblInp.value='';renderSubPanelContent('tipos-cuenta');updateSettingsCounts();showToast('✓ Tipo agregado');}
 
@@ -1147,7 +1222,7 @@ function historyItemHtml(e){
     <div class="hi-icon" style="background:${c.bg}"><i class="ti ${c.iconClass}" style="font-size:18px;color:${c.iconColor}"></i></div>
     <div class="hi-desc">
       <div class="hi-name">${e.desc||e.sub||c.label}${badge}</div>
-      <div class="hi-meta">${e.sub}${cu?' · '+cu.nombre:''} · ${e.day}/${e.month+1}/${e.year}</div>
+      <div class="hi-meta">${e.sub}${e.subcat?' › '+e.subcat:''}${cu?' · '+cu.nombre:''} · ${e.day}/${e.month+1}/${e.year}</div>
     </div>
     <div class="hi-amount" style="color:${c.color}">${fmtDec(e.amount)}</div>
     <div class="hi-actions">
@@ -1339,7 +1414,7 @@ function openCuentaDetail(id){
           <div class="hi-icon" style="background:${c.bg}"><i class="ti ${c.iconClass}" style="font-size:16px;color:${c.iconColor}"></i></div>
           <div class="hi-desc">
             <div class="hi-name">${e.desc||e.sub||c.label}${badge}</div>
-            <div class="hi-meta">${e.sub} · ${e.day}/${e.month+1}/${e.year}</div>
+            <div class="hi-meta">${e.sub}${e.subcat?' › '+e.subcat:''} · ${e.day}/${e.month+1}/${e.year}</div>
           </div>
           <div class="hi-amount" style="color:${c.color}">${fmtDec(e.amount)}</div>
           <div class="hi-actions">
@@ -1537,7 +1612,7 @@ function openModal(type,prefillEntry=null){
   document.getElementById('delete-entry-btn').style.display='none';
   document.getElementById('neg-toggle-row').style.display='none';
   selectedSub=c.sub[0];cuotasCount=1;
-  renderPills(c);renderCuentaPills(type);
+  renderPills(c);renderCuentaPills(type);renderSubcatPills(type,selectedSub,null);
   const cw=document.getElementById('cuotas-wrap');
   if(type==='tarjetas'){cw.classList.add('visible');updateCuotasInfo();}else cw.classList.remove('visible');
   document.getElementById('modal-overlay').classList.add('open');
@@ -1561,7 +1636,7 @@ function openEditModal(ts){
   document.getElementById('delete-entry-btn').style.display='block';
   document.getElementById('neg-toggle-row').style.display='none';
   selectedSub=e.sub||c.sub[0];cuotasCount=e.cuotas||1;
-  renderPills(c);renderCuentaPills(e.type,e.cuentaId);
+  renderPills(c);renderCuentaPills(e.type,e.cuentaId);renderSubcatPills(e.type,selectedSub,e.subcat||null);
   document.getElementById('cuotas-num').textContent=cuotasCount;
   const cw=document.getElementById('cuotas-wrap');
   if(e.type==='tarjetas'){cw.classList.add('visible');updateCuotasInfo();}else cw.classList.remove('visible');
@@ -1576,7 +1651,21 @@ function renderPills(c){
     return `<div class="cat-pill${isSel?' selected':''}" style="${isSel?`background:${c.color}20;color:${c.color};border-color:${c.color}`:''}" onclick="selectSub('${s}')">${s}</div>`;
   }).join('');
 }
-function selectSub(s){selectedSub=s;renderPills(getCat(currentType));}
+function selectSub(s){selectedSub=s;renderPills(getCat(currentType));renderSubcatPills(currentType,s,null);}
+function renderSubcatPills(type,cat,selectedVal){
+  const label=document.getElementById('subcat-field-label');
+  const wrap=document.getElementById('subcat-pills');
+  const items=getSubcats(type,cat);
+  if(!items.length){label.style.display='none';wrap.innerHTML='';selectedSubcat=null;return;}
+  label.style.display='block';
+  selectedSubcat=(selectedVal&&items.includes(selectedVal))?selectedVal:null;
+  wrap.innerHTML='<div class="cat-pill'+(!selectedSubcat?' selected':'')+'" onclick="selectSubcat(null)">Ninguna</div>'
+    +items.map(s=>{
+      const isSel=s===selectedSubcat;
+      return '<div class="cat-pill'+(isSel?' selected':'')+'" onclick="selectSubcat(\''+jsStr(s)+'\')">'+s+'</div>';
+    }).join('');
+}
+function selectSubcat(s){renderSubcatPills(currentType,selectedSub,s);}
 function renderCuentaPills(type,selectedId=null){
   const cl=document.getElementById('cuenta-field-label');
   const cp=document.getElementById('cuenta-pills');
@@ -1616,7 +1705,7 @@ function saveEntry(){
     // EDICIÓN: actualizar entry existente
     const idx=entries.findIndex(e=>e.ts===editingTs);
     if(idx>=0){
-      entries[idx]={...entries[idx],amount:amt,desc,sub:selectedSub,cuentaId:selectedCuentaId,year:fecha.year,month:fecha.month,day:fecha.day};
+      entries[idx]={...entries[idx],amount:amt,desc,sub:selectedSub,subcat:selectedSubcat,cuentaId:selectedCuentaId,year:fecha.year,month:fecha.month,day:fecha.day};
     }
     save();closeModal();updateAll();showToast('✓ Movimiento actualizado');
     return;
@@ -1629,11 +1718,11 @@ function saveEntry(){
     for(let i=0;i<cuotasCount;i++){
       let m=fecha.month+i+1,y=fecha.year;
       while(m>11){m-=12;y++;}
-      entries.push({type:currentType,amount:cuotaAmt,sub:selectedSub,desc,month:m,year:y,day:tarjetaConfig.diavencimiento,ts:baseTs+i,cuotas:cuotasCount,cuotaNum:i+1,cuentaId:selectedCuentaId});
+      entries.push({type:currentType,amount:cuotaAmt,sub:selectedSub,subcat:selectedSubcat,desc,month:m,year:y,day:tarjetaConfig.diavencimiento,ts:baseTs+i,cuotas:cuotasCount,cuotaNum:i+1,cuentaId:selectedCuentaId});
     }
     showToast(`✓ ${cuotasCount} cuotas guardadas`);
   }else{
-    entries.push({type:currentType,amount:amt,sub:selectedSub,desc,month:fecha.month,year:fecha.year,day:fecha.day,ts:Date.now(),cuotas:1,cuotaNum:1,cuentaId:selectedCuentaId});
+    entries.push({type:currentType,amount:amt,sub:selectedSub,subcat:selectedSubcat,desc,month:fecha.month,year:fecha.year,day:fecha.day,ts:Date.now(),cuotas:1,cuotaNum:1,cuentaId:selectedCuentaId});
     showToast('✓ Guardado');
   }
   save();closeModal();updateAll();
@@ -1866,11 +1955,11 @@ function setExportScope(s){
 function exportCSV(){
   const rows=exportScope==='mes'?getFiltered():entries;
   const bom='﻿';
-  const header='Fecha,Tipo,Categoria,Descripcion,Monto,Cuenta\n';
+  const header='Fecha,Tipo,Categoria,Subcategoria,Descripcion,Monto,Cuenta\n';
   const body=rows.map(e=>{
     const cu=cuentas.find(c=>c.id===e.cuentaId);
     const tipo=e.kind==='transfer'?'Transferencia':e.type;
-    return [e.day+'/'+(e.month+1)+'/'+e.year,tipo,e.sub||'',e.desc||'',e.amount||0,cu?.nombre||'']
+    return [e.day+'/'+(e.month+1)+'/'+e.year,tipo,e.sub||'',e.subcat||'',e.desc||'',e.amount||0,cu?.nombre||'']
       .map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',');
   }).join('\n');
   const blob=new Blob([bom+header+body],{type:'text/csv;charset=utf-8'});
@@ -2164,7 +2253,7 @@ saveEntry = function(){
   if(editingTs !== null){
     const idx = entries.findIndex(e => e.ts === editingTs);
     if(idx >= 0){
-      entries[idx] = {...entries[idx], amount:amt, desc, sub:selectedSub, cuentaId:selectedCuentaId, nota, foto, tags,
+      entries[idx] = {...entries[idx], amount:amt, desc, sub:selectedSub, subcat:selectedSubcat, cuentaId:selectedCuentaId, nota, foto, tags,
         year:fecha.year, month:fecha.month, day:fecha.day};
     }
     save(); closeModal(); updateAll(); showToast('Actualizado'); return;
@@ -2175,13 +2264,13 @@ saveEntry = function(){
     for(let i = 0; i < cuotasCount; i++){
       let m = fecha.month + i + 1, y = fecha.year;
       while(m > 11){ m -= 12; y++; }
-      entries.push({type:currentType, amount:cuotaAmt, sub:selectedSub, desc, month:m, year:y,
+      entries.push({type:currentType, amount:cuotaAmt, sub:selectedSub, subcat:selectedSubcat, desc, month:m, year:y,
         day:tarjetaConfig.diavencimiento, ts:baseTs+i, cuotas:cuotasCount, cuotaNum:i+1,
         cuentaId:selectedCuentaId, nota, foto, tags, esRecurrente:false});
     }
     showToast(cuotasCount + ' cuotas guardadas');
   } else {
-    entries.push({type:currentType, amount:amt, sub:selectedSub, desc, month:fecha.month,
+    entries.push({type:currentType, amount:amt, sub:selectedSub, subcat:selectedSubcat, desc, month:fecha.month,
       year:fecha.year, day:fecha.day, ts:Date.now(), cuotas:1, cuotaNum:1,
       cuentaId:selectedCuentaId, nota, foto, tags, esRecurrente:false});
     showToast('Guardado');
