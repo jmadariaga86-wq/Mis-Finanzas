@@ -301,6 +301,14 @@ body{background:var(--bg);color:var(--text1);transition:background .2s,color .2s
 
 /* TAGS */
 .tag-filter-bar{display:flex;gap:6px;overflow-x:auto;padding:8px 14px 4px;margin-bottom:4px}
+.search-wrap{position:relative;margin:12px 14px 4px}
+.search-input{width:100%;padding:11px 36px;border-radius:12px;border:1.5px solid var(--border);font-size:14px;color:var(--text1);background:var(--bg2);outline:none;transition:border-color .15s}
+.search-input:focus{border-color:#1B6B4A}
+.search-input::placeholder{color:var(--text4)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text4);font-size:17px;pointer-events:none}
+.search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--text4);font-size:15px;cursor:pointer;width:22px;height:22px;display:none;align-items:center;justify-content:center;border-radius:50%}
+.search-clear:active{background:var(--bg3)}
+.search-scope-note{font-size:11.5px;color:var(--text4);padding:0 14px 6px}
 .tag-filter-bar::-webkit-scrollbar{display:none}
 .tag-chip-filter{padding:5px 12px;border-radius:18px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);color:var(--text3);white-space:nowrap;flex-shrink:0;background:var(--bg2)}
 .tag-chip-filter.active{background:var(--green);color:white;border-color:var(--green)}
@@ -395,6 +403,12 @@ body{background:var(--bg);color:var(--text1);transition:background .2s,color .2s
   </div>
 
   <div id="page-movimientos" class="page">
+    <div class="search-wrap">
+      <i class="ti ti-search search-icon"></i>
+      <input type="text" id="search-input" class="search-input" placeholder="Buscar por descripción, categoría..." oninput="onSearchInput()">
+      <i class="ti ti-x search-clear" id="search-clear" onclick="clearSearch()"></i>
+    </div>
+    <div class="search-scope-note" id="search-scope-note" style="display:none">Buscando en todos los meses</div>
     <div class="tag-filter-bar" id="tag-filter-bar"></div>
     <div style="padding:0 14px 16px">
       <div class="section-label" style="margin-bottom:10px">Todos los movimientos</div>
@@ -1222,7 +1236,7 @@ function historyItemHtml(e){
     <div class="hi-icon" style="background:${c.bg}"><i class="ti ${c.iconClass}" style="font-size:18px;color:${c.iconColor}"></i></div>
     <div class="hi-desc">
       <div class="hi-name">${e.desc||e.sub||c.label}${badge}</div>
-      <div class="hi-meta">${e.sub}${e.subcat?' › '+e.subcat:''}${cu?' · '+cu.nombre:''} · ${e.day}/${e.month+1}/${e.year}</div>
+      <div class="hi-meta">${e.sub}${cu?' · '+cu.nombre:''} · ${e.day}/${e.month+1}/${e.year}</div>
     </div>
     <div class="hi-amount" style="color:${c.color}">${fmtDec(e.amount)}</div>
     <div class="hi-actions">
@@ -1414,7 +1428,7 @@ function openCuentaDetail(id){
           <div class="hi-icon" style="background:${c.bg}"><i class="ti ${c.iconClass}" style="font-size:16px;color:${c.iconColor}"></i></div>
           <div class="hi-desc">
             <div class="hi-name">${e.desc||e.sub||c.label}${badge}</div>
-            <div class="hi-meta">${e.sub}${e.subcat?' › '+e.subcat:''} · ${e.day}/${e.month+1}/${e.year}</div>
+            <div class="hi-meta">${e.sub} · ${e.day}/${e.month+1}/${e.year}</div>
           </div>
           <div class="hi-amount" style="color:${c.color}">${fmtDec(e.amount)}</div>
           <div class="hi-actions">
@@ -1955,11 +1969,11 @@ function setExportScope(s){
 function exportCSV(){
   const rows=exportScope==='mes'?getFiltered():entries;
   const bom='﻿';
-  const header='Fecha,Tipo,Categoria,Subcategoria,Descripcion,Monto,Cuenta\n';
+  const header='Fecha,Tipo,Categoria,Descripcion,Monto,Cuenta\n';
   const body=rows.map(e=>{
     const cu=cuentas.find(c=>c.id===e.cuentaId);
     const tipo=e.kind==='transfer'?'Transferencia':e.type;
-    return [e.day+'/'+(e.month+1)+'/'+e.year,tipo,e.sub||'',e.subcat||'',e.desc||'',e.amount||0,cu?.nombre||'']
+    return [e.day+'/'+(e.month+1)+'/'+e.year,tipo,e.sub||'',e.desc||'',e.amount||0,cu?.nombre||'']
       .map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',');
   }).join('\n');
   const blob=new Blob([bom+header+body],{type:'text/csv;charset=utf-8'});
@@ -2292,15 +2306,51 @@ historyItemHtml = function(e, context){
   return html;
 };
 
-// ── PATCH updateHistory to apply tag filter ──
+// ── PATCH updateHistory to apply tag filter + search ──
 const _origUpdateHistory = updateHistory;
+function entrySearchText(e){
+  if(e.kind==='transfer'){
+    const fromCu=cuentas.find(c=>c.id===e.fromId), toCu=cuentas.find(c=>c.id===e.toId);
+    return [e.desc||'','transferencia',fromCu?fromCu.nombre:'',toCu?toCu.nombre:''].join(' ').toLowerCase();
+  }
+  const cu=cuentas.find(c=>c.id===e.cuentaId);
+  return [e.desc||'',e.sub||'',e.subcat||'',cu?cu.nombre:'',(e.tags||[]).join(' '),e.nota||''].join(' ').toLowerCase();
+}
+function sortByDateDesc(a,b){ return (b.year-a.year)||(b.month-a.month)||(b.day-a.day)||(b.ts-a.ts); }
 updateHistory = function(){
-  let es = getFiltered().slice().sort(function(a,b){ return (b.year-a.year)||(b.month-a.month)||(b.day-a.day)||(b.ts-a.ts); });
+  const note = document.getElementById('search-scope-note');
+  let es;
+  if(searchQuery){
+    if(note) note.style.display='block';
+    es = entries.filter(function(e){ return entrySearchText(e).includes(searchQuery); }).slice().sort(sortByDateDesc);
+  } else {
+    if(note) note.style.display='none';
+    es = getFiltered().slice().sort(sortByDateDesc);
+  }
   if(activeTagFilter) es = es.filter(function(e){ return (e.tags||[]).includes(activeTagFilter); });
   const el = document.getElementById('history-list');
-  if(!es.length){ el.innerHTML = '<div class="history-empty"><i class="ti ti-receipt-off"></i>Sin movimientos este mes</div>'; return; }
+  if(!es.length){
+    const msg = searchQuery ? 'No se encontraron movimientos' : 'Sin movimientos este mes';
+    el.innerHTML = '<div class="history-empty"><i class="ti ti-receipt-off"></i>'+msg+'</div>';
+    return;
+  }
   el.innerHTML = es.map(function(e){ return historyItemHtml(e); }).join('');
 };
+let searchQuery = '';
+function onSearchInput(){
+  searchQuery = document.getElementById('search-input').value.trim().toLowerCase();
+  const clearBtn = document.getElementById('search-clear');
+  if(clearBtn) clearBtn.style.display = searchQuery ? 'flex' : 'none';
+  updateHistory();
+}
+function clearSearch(){
+  const inp = document.getElementById('search-input');
+  if(inp) inp.value='';
+  searchQuery='';
+  const clearBtn = document.getElementById('search-clear');
+  if(clearBtn) clearBtn.style.display='none';
+  updateHistory();
+}
 
 // ── PATCH sumType to exclude accounts not in balance ──
 const _origSumType = sumType;
