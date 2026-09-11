@@ -35,7 +35,11 @@ body{background:var(--bg);color:var(--text1);transition:background .2s,color .2s
 .balance-label{font-size:12px;color:rgba(255,255,255,.65);margin-bottom:4px}
 .balance-amount{font-size:36px;font-weight:700;color:white;letter-spacing:-1.5px;margin-bottom:14px}
 .balance-amount.negativo{color:#fca5a5}
-.view-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.view-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scroll-behavior:smooth}
+.view-tabs-wrap{display:flex;align-items:center;gap:4px}
+.vtab-arrow{flex-shrink:0;width:24px;height:24px;border-radius:50%;border:none;background:rgba(255,255,255,.25);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.vtab-arrow:active{background:rgba(255,255,255,.4)}
+.vtab-arrow i{font-size:15px;pointer-events:none}
 .view-tabs::-webkit-scrollbar{display:none}
 .vtab{font-size:12px;padding:5px 14px;border-radius:20px;cursor:pointer;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.75);font-weight:500;transition:all .15s;white-space:nowrap;flex-shrink:0}
 .vtab.active{background:white;color:#1B6B4A;border-color:white}
@@ -359,12 +363,16 @@ body{background:var(--bg);color:var(--text1);transition:background .2s,color .2s
   </div>
   <div class="balance-label">Balance mensual</div>
   <div class="balance-amount" id="balance-display">$0</div>
-  <div class="view-tabs">
-    <div class="vtab active" onclick="switchView('personal',this)">Personal</div>
-    <div class="vtab" onclick="switchView('transferencias',this)">Transferencias</div>
-    <div class="vtab" onclick="switchView('metas',this)">Metas</div>
-    <div class="vtab" onclick="switchView('recurrentes',this)">Recurrentes</div>
-    <div class="vtab" onclick="switchView('presupuestos',this)">Presupuestos</div>
+  <div class="view-tabs-wrap">
+    <button class="vtab-arrow" id="vtab-arrow-left" onclick="scrollViewTabs(-1)"><i class="ti ti-chevron-left"></i></button>
+    <div class="view-tabs" id="view-tabs">
+      <div class="vtab active" onclick="switchView('personal',this)">Personal</div>
+      <div class="vtab" onclick="switchView('transferencias',this)">Transferencias</div>
+      <div class="vtab" onclick="switchView('metas',this)">Metas</div>
+      <div class="vtab" onclick="switchView('recurrentes',this)">Recurrentes</div>
+      <div class="vtab" onclick="switchView('presupuestos',this)">Presupuestos</div>
+    </div>
+    <button class="vtab-arrow" id="vtab-arrow-right" onclick="scrollViewTabs(1)"><i class="ti ti-chevron-right"></i></button>
   </div>
 </div>
 
@@ -2459,6 +2467,41 @@ load();
 updateCurrencyUI();
 updateAll();
 renderTarjetaReminder();
+
+// ── Scroll de la barra Personal/Transferencias/Metas/Recurrentes/Presupuestos ──
+function scrollViewTabs(dir){
+  const el=document.getElementById('view-tabs');
+  if(el) el.scrollBy({left:dir*120,behavior:'smooth'});
+}
+(function initViewTabsScroll(){
+  const el=document.getElementById('view-tabs');
+  if(!el)return;
+  // rueda del mouse (desktop) mueve horizontalmente
+  el.addEventListener('wheel',function(e){
+    if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){e.preventDefault();el.scrollLeft+=e.deltaY;}
+  },{passive:false});
+  // arrastrar con el mouse (desktop) como si fuera swipe
+  let isDown=false,startX=0,startScroll=0,moved=false;
+  el.addEventListener('mousedown',function(e){isDown=true;moved=false;startX=e.pageX;startScroll=el.scrollLeft;});
+  window.addEventListener('mousemove',function(e){
+    if(!isDown)return;
+    const dx=e.pageX-startX;
+    if(Math.abs(dx)>4)moved=true;
+    el.scrollLeft=startScroll-dx;
+  });
+  window.addEventListener('mouseup',function(){isDown=false;});
+  el.addEventListener('click',function(e){if(moved){e.stopPropagation();e.preventDefault();}},true);
+  // mostrar/ocultar flechas según la posición del scroll
+  const leftBtn=document.getElementById('vtab-arrow-left'),rightBtn=document.getElementById('vtab-arrow-right');
+  function updateArrows(){
+    if(!leftBtn||!rightBtn)return;
+    leftBtn.style.visibility=el.scrollLeft<=2?'hidden':'visible';
+    rightBtn.style.visibility=(el.scrollLeft+el.clientWidth>=el.scrollWidth-2)?'hidden':'visible';
+  }
+  el.addEventListener('scroll',updateArrows);
+  updateArrows();
+  window.addEventListener('resize',updateArrows);
+})();
 </script>
 </body>
 </html>
